@@ -1,0 +1,36 @@
+services:
+  # Main Streamlit app
+  - type: web
+    name: sports-pick-lock
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PRICE_ID
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: ODDS_API_KEY
+        sync: false
+      - key: APP_URL
+        sync: false
+
+  # Stripe webhook server
+  - type: web
+    name: sports-pick-lock-webhooks
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn billing.webhook_server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
