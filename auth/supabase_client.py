@@ -5,11 +5,15 @@ Free tier: https://supabase.com (50k MAU, no credit card needed)
 import os
 from config import SUPABASE_URL, SUPABASE_ANON_KEY
 
+def _is_valid_url(url: str) -> bool:
+    return url.startswith("https://") and ".supabase.co" in url
+
 try:
     from supabase import create_client, Client
-    _sb: Client | None = create_client(SUPABASE_URL, SUPABASE_ANON_KEY) if SUPABASE_URL and SUPABASE_ANON_KEY else None
+    _ready = bool(SUPABASE_URL and SUPABASE_ANON_KEY and _is_valid_url(SUPABASE_URL))
+    _sb: Client | None = create_client(SUPABASE_URL, SUPABASE_ANON_KEY) if _ready else None
     SUPABASE_AVAILABLE = _sb is not None
-except ImportError:
+except Exception:
     _sb = None
     SUPABASE_AVAILABLE = False
 
