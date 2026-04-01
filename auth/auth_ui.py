@@ -18,6 +18,9 @@ def is_logged_in() -> bool:
     init_session()
     if not st.session_state.auth_token:
         return False
+    # Dev mode bypass — skip Supabase validation
+    if st.session_state.auth_token == "dev_token":
+        return True
     user = get_user(st.session_state.auth_token)
     if not user:
         st.session_state.auth_token = None
@@ -30,6 +33,9 @@ def is_logged_in() -> bool:
 def is_subscribed() -> bool:
     if not is_logged_in():
         return False
+    # Dev mode bypass — skip Stripe check
+    if st.session_state.auth_token == "dev_token":
+        return True
     user_id = st.session_state.user.get("id")
     email = st.session_state.user.get("email")
     sub = get_subscription_status(user_id, email)
